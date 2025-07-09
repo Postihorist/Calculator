@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
@@ -10,6 +11,7 @@ namespace Calculus
     {
         [System.Runtime.InteropServices.DllImport("dwmapi.dll", PreserveSig = true)]
         public static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, int[] val, int size);
+        private string temp = String.Empty;
         public form()
         {
             InitializeComponent();
@@ -24,9 +26,11 @@ namespace Calculus
                         this.BackColor = Color.FromArgb(255, 25, 25, 25);
                         textBox1.BackColor = Color.FromArgb(255, 19, 19, 19);
                         textBox2.BackColor = Color.FromArgb(255, 19, 19, 19);
+                        label1.BackColor = Color.FromArgb(255, 19, 19, 19);
                         toolStrip.BackColor = Color.FromArgb(255, 25, 25, 25);
                         toolStrip.ForeColor = SystemColors.Window;
                         textBox1.ForeColor = SystemColors.Window;
+                        label1.ForeColor = SystemColors.Window;
                         textBox2.ForeColor = SystemColors.ControlDark;
                     }
                     else
@@ -183,7 +187,7 @@ namespace Calculus
                         number += ex[i];
                         i++;
                     }
-                    operands.Push(double.Parse(number));
+                    operands.Push(double.Parse(number, CultureInfo.GetCultureInfo("en-US")));
                 }
                 else if (char.IsLetter(ex[i]))
                 {
@@ -283,7 +287,7 @@ namespace Calculus
         }
         private void Solve()
         {
-            string func = textBox1.Text.Replace("π", Math.PI.ToString()).Replace("e", Math.E.ToString()).Replace(" ", String.Empty);
+            string func = textBox1.Text.Replace("π", Math.PI.ToString(CultureInfo.GetCultureInfo("en-US"))).Replace("e", Math.E.ToString(CultureInfo.GetCultureInfo("en-US"))).Replace(" ", String.Empty);
             for (int i = 0; i < func.Length; i++)
             {
                 if (func[i] == '-')
@@ -297,7 +301,7 @@ namespace Calculus
             try
             {
                 double result = Evaluate(func);
-                Enter(result.ToString());
+                Enter(result.ToString(CultureInfo.GetCultureInfo("en-US")));
             }
             catch (Exception)
             {
@@ -306,6 +310,11 @@ namespace Calculus
         }
         private void Enter(string s)
         {
+            if (label1.Text == "⏶")
+            {
+                label1.Text = "⏷";
+                (temp, textBox2.Text) = (textBox2.Text, temp);
+            }
             if (textBox2.Text != String.Empty)
             {
                 textBox2.AppendText(Environment.NewLine + s);
@@ -314,6 +323,7 @@ namespace Calculus
             {
                 textBox2.AppendText(s);
             }
+            temp = textBox1.Text;
         }
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -321,6 +331,20 @@ namespace Calculus
             {
                 e.SuppressKeyPress = true;
                 Solve();
+            }
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+            if (label1.Text == "⏷")
+            {
+                label1.Text = "⏶";
+                (temp, textBox2.Text) = (textBox2.Text, temp);
+            }
+            else
+            {
+                label1.Text = "⏷";
+                (temp, textBox2.Text) = (textBox2.Text, temp);
             }
         }
     }
